@@ -4,13 +4,15 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views import generic
-
+from django.views.generic import CreateView
 from django.utils import timezone
+from django.views.generic import ListView, DetailView, UpdateView, DeleteView
 
 from .models import Choice, Question
 from .models import Author
 from .forms import ContactForm
 from django.views.generic.edit import FormView
+# Create your views here.
 
 
 class ContactFormView(FormView):
@@ -24,24 +26,32 @@ class ContactFormView(FormView):
         form.send_email()
         return super().form_valid(form)
     
-class ContactThanksView(generic.TemplateView):
+class ContactThanksView(FormView):
     template_name = "polls/thanks.html"
 
-class AuthorCreateView(generic.CreateView):
+class AuthorCreateView(CreateView):
     model = Author
     fields = ["name", "message"]
     template_name = "polls/author_form.html"
     success_url = "/polls/thanks/"
 
-class AuthorUpdateView(generic.UpdateView):
-    model = Author
-    fields = ["name"]
+class AuthorUpdateView(UpdateView):
+    model = Question
+    fields = ["question_text","image"]
+
     template_name = "polls/author_update_form.html"
-    success_url = "/thanks/"
 
+    def get_success_url(self):
+        return reverse("polls:index")
+    
+class AuthorDeleteView(DeleteView):
+    model = Question
+    template_name = "polls/author_confirm_delete.html"
 
+    def get_success_url(self):
+        return reverse("polls:index")
 
-class IndexView(generic.ListView):
+class IndexView(ListView):
     template_name = "polls/index.html"
 
     def get_queryset(self):
@@ -52,7 +62,7 @@ class IndexView(generic.ListView):
         return Question.objects.filter(pub_date__lte=timezone.now()).order_by("-pub_date")[:5]
 
 
-class DetailView(generic.DetailView):
+class DetailView(DetailView):
     template_name = "polls/detail.html"
 
     def get_queryset(self):
@@ -69,7 +79,7 @@ class DetailView(generic.DetailView):
         return context
 
 
-class ResultsView(generic.DetailView):
+class ResultsView(DetailView):
     model = Question
     template_name = "polls/results.html"
 

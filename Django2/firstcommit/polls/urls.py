@@ -1,4 +1,7 @@
 from django.urls import path
+from .views import AuthorUpdateView    
+from django.conf import settings
+from django.conf.urls.static import static
 
 from . import views
 
@@ -10,6 +13,7 @@ urlpatterns = [
     path("<int:question_id>/vote/", views.vote, name="vote"),
     path("contact/", views.ContactFormView.as_view(), name="contact"),
     path("thanks/", views.ContactFormView.as_view(), name="thanks"),
-    path("author/create/", views.AuthorCreateView.as_view(), name="author-create"),
-    path("author/<int:question_id>/update/", views.AuthorUpdateView.as_view(), name="author-update"),
-]
+    path("create/", views.AuthorCreateView.as_view(), name="create"),
+    path("<int:pk>/update/", views.AuthorUpdateView.as_view(),name="update"),
+    path("<int:pk>/delete/", views.AuthorDeleteView.as_view(), name="delete"),
+]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
